@@ -4,12 +4,6 @@
  * 
  * Make sure to delete 
  * 
- * The Scripted Decision Node needs the following outcomes defined:
- * - one
- * - multiple
- * - none
- *
- * Author: volker.scheuber@forgerock.com
  */
 (function () {
     logger.message("IDP Lookup: start");
