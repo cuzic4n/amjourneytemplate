@@ -1,6 +1,6 @@
 /* AM Journey Template
  *
- * Authors: fname.lname@forgerock.com, fname.lname@forgerock.com
+ * Authors: chico.demetroff@forgerock.com, volker.scheuber@forgerock.com, john.kimble@forgerock.com, ali.falahi@forgerock.com
  * 
  * Description of the script goes here
  * 
