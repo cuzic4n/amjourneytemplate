@@ -1,114 +1,211 @@
 /* AM Journey Template
+ *
+ * Authors: fname.lname@forgerock.com, fname.lname@forgerock.com
  * 
- * This is a default template with examples to give you a jump start
+ * Description of the script goes here
  * 
- * Make sure to delete 
+ * This script needs to be parametrized. It will not work properly as is. 
+ * It requires ???? nodes before
+ * it can operate.
  * 
+ * The Scripted Decision Node needs the following outcomes defined:
+ * - true
+ *   describe true outcome
+ * - false 
+ *   describe false outcome
  */
+// Do everything in a self-invoking function and do not write code outside of a function or you will pay dearly. This is because of some top-level scoping/whitelisting/etc issues that you can run into
 (function () {
-    logger.message("IDP Lookup: start");
-  	outcome = "none";
-  	var username = sharedState.get("username");
-  	var domain = username.substr(username.lastIndexOf("@")+1);
-  	var referer = parseUrl(requestHeaders.get("referer").get(0));
+    logger.message("Script: start");
+    outcome = "true"; // <- fill in default outcome here and it should match a "Script Outcomes" setting on this node itself
 
-  	/* Begin Configuration */
-  
-    // long-lived token, expires: Monday, October 13, 2031 1:12:39 AM GMT
-    var IDM_API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmNjhkZjgzYi1lZTA4LTRlOTAtYjQ0NC0yZWUxMGQ5MjJmMDYiLCJjdHMiOiJPQVVUSDJfU1RBVEVMRVNTX0dSQU5UIiwiYXV0aF9sZXZlbCI6MCwiYXVkaXRUcmFja2luZ0lkIjoiZjM1ZjQ1OTQtYWNkZS00Mjg4LWE0YWItZTQ5ZTljMjBmZGIxLTEyMTk3OTciLCJzdWJuYW1lIjoiZjY4ZGY4M2ItZWUwOC00ZTkwLWI0NDQtMmVlMTBkOTIyZjA2IiwiaXNzIjoiaHR0cHM6Ly9vcGVuYW0tYnJvYWRjb20tcGVyZi5mb3JnZWJsb2Nrcy5jb206NDQzL2FtL29hdXRoMi9hbHBoYSIsInRva2VuTmFtZSI6ImFjY2Vzc190b2tlbiIsInRva2VuX3R5cGUiOiJCZWFyZXIiLCJhdXRoR3JhbnRJZCI6IjdmZHlfcnMxUkFWX2tSdzFuRmlFZklkNTVHVSIsImF1ZCI6ImY2OGRmODNiLWVlMDgtNGU5MC1iNDQ0LTJlZTEwZDkyMmYwNiIsIm5iZiI6MTYzNDI2MDM1OSwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwic2NvcGUiOlsiZnI6aWRtOioiXSwiYXV0aF90aW1lIjoxNjM0MjYwMzU5LCJyZWFsbSI6Ii9hbHBoYSIsImV4cCI6MTk0OTYyMDM1OSwiaWF0IjoxNjM0MjYwMzU5LCJleHBpcmVzX2luIjozMTUzNjAwMDAsImp0aSI6Ik5xcGJIUlZBSWlDSTBXMVRhYjVKZ21UdFJyWSJ9.AUwvj6kRvRMnBw4IglFq-6a6iLPYKp-HV_MV_BCzvWM";
+    var output = createHtml();
+    displayMessage(output);
 
-    // IDM API Configuration
-    var IDM_API_URI = referer.origin + "/openidm/managed/alpha_organization?_queryFilter=idpDomains+co+'" + domain + "'&_fields=name,description,idpName,idpType,idpDomains,idpJourney,idpTheme,idpMFA,idpMFAType,idpPersist,idpApps,idpSAMLConfig";
+    logger.message("Script: end");
 
-  	/* End Configuration */
-
-    var request = new org.forgerock.http.protocol.Request();
-    request.setMethod('GET');
-    request.setUri(IDM_API_URI);
-	request.getHeaders().add("Content-Type", "application/json; charset=UTF-8");
-	request.getHeaders().add("Authorization", "Bearer " + IDM_API_TOKEN);
-
-    var response = httpClient.send(request).get();
-    var result = JSON.parse(response.getEntity().getString());
-    logger.message("IDP Lookup: JSON result: " + JSON.stringify(result));
-	
-  	var routedIDPs = result.result.length ? result.result : [{}];
-  	// store apps as a pipe-delimited string so they can be stored in session props later on
-  	if (routedIDPs[0].idpApps) {
-  		routedIDPs[0]["idpApps"] = routedIDPs[0].idpApps.join('|');
+    function createHtml() {
+        var html = "<table>";
+        html += "<tr><td colspan=\"2\"><b>Shared State Variables<b></td></tr>";
+        // get all the keys in nodeState
+        var iterator = nodeState.keys().iterator();
+      	var stateKeys = [];
+        while (iterator.hasNext()) {
+            stateKeys.push(iterator.next().toString());
+        }
+        stateKeys.forEach(function (stateKey) {
+          if (sharedState.get(stateKey) 
+              && sharedState.get(stateKey).toString() !== "null"
+              && sharedState.get(stateKey).toString() !== ""
+              && ""+stateKey !== "objectAttributes") 
+          {
+            html += "<tr><td>" + stateKey + "</td><td>" + sharedState.get(stateKey) + "</td></tr>";
+          }
+        });
+      
+        html += "<tr><td colspan=\"2\"><br></td></tr>";
+        html += "<tr><td colspan=\"2\"><b>Transient State Variables<b></td></tr>";
+        // get all the keys in nodeState
+        var iterator = nodeState.keys().iterator();
+      	var stateKeys = [];
+        while (iterator.hasNext()) {
+            stateKeys.push(iterator.next().toString());
+        }
+        stateKeys.forEach(function (stateKey) {
+          if (transientState.get(stateKey) 
+              && transientState.get(stateKey).toString() !== "null" 
+              && transientState.get(stateKey).toString() !== ""
+              && ""+stateKey !== "objectAttributes") 
+          {
+            html += "<tr><td>" + stateKey + "</td><td>" + transientState.get(stateKey) + "</td></tr>";
+          }
+        });
+      	
+        var objAttrs = [    
+          "_id",
+          "userName",
+          "accountStatus",
+          "effectiveRoles",
+          "effectiveAssignments",
+          "postalCode",
+          "stateProvince",
+          "postalAddress",
+          "description",
+          "country",
+          "city",
+          "givenName",
+          "sn",
+          "telephoneNumber",
+          "mail",
+          "frIndexedString1",
+          "frIndexedString2",
+          "frIndexedString3",
+          "frIndexedString4",
+          "frIndexedString5",
+          "frUnindexedString1",
+          "frUnindexedString2",
+          "frUnindexedString3",
+          "frUnindexedString4",
+          "frUnindexedString5",
+          "frIndexedMultivalued1",
+          "frIndexedMultivalued2",
+          "frIndexedMultivalued3",
+          "frIndexedMultivalued4",
+          "frIndexedMultivalued5",
+          "frUnindexedMultivalued1",
+          "frUnindexedMultivalued2",
+          "frUnindexedMultivalued3",
+          "frUnindexedMultivalued4",
+          "frUnindexedMultivalued5",
+          "frIndexedDate1",
+          "frIndexedDate2",
+          "frIndexedDate3",
+          "frIndexedDate4",
+          "frIndexedDate5",
+          "frUnindexedDate1",
+          "frUnindexedDate2",
+          "frUnindexedDate3",
+          "frUnindexedDate4",
+          "frUnindexedDate5",
+          "frIndexedInteger1",
+          "frIndexedInteger2",
+          "frIndexedInteger3",
+          "frIndexedInteger4",
+          "frIndexedInteger5",
+          "frUnindexedInteger1",
+          "frUnindexedInteger2",
+          "frUnindexedInteger3",
+          "frUnindexedInteger4",
+          "frUnindexedInteger5",
+          "consentedMappings",
+          "kbaInfo",
+          "preferences",
+          "aliasList",
+          "memberOfOrgIDs",
+          "manager"  
+        ];
+      	var attrs;
+      	if (sharedState.get("objectAttributes"))
+        {
+      
+          html += "<tr><td colspan=\"2\"><br></td></tr>";
+          html += "<tr><td colspan=\"2\"><b>Shared Object Attributes<b></td></tr>";
+          attrs = sharedState.get("objectAttributes");
+          objAttrs.forEach(function (attr) {
+            if (attrs.get(attr) 
+                && ""+attrs.get(attr) !== "null"
+                && ""+attrs.get(attr) !== "") 
+            {
+              html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
+            }
+          });
+        }
+      
+      	if (transientState.get("objectAttributes"))
+        {
+          html += "<tr><td colspan=\"2\"><br></td></tr>";
+          html += "<tr><td colspan=\"2\"><b>Transient Object Attributes<b></td></tr>";
+          attrs = transientState.get("objectAttributes");
+          objAttrs.forEach(function (attr) {
+            if (attrs.get(attr) 
+                && ""+attrs.get(attr) !== "null"
+                && ""+attrs.get(attr) !== "") 
+            {
+              html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
+            }
+          });
+          html += "</table>";
+        }
+      
+        return html;
     }
-  	sharedState.put("routedIDPs", routedIDPs);
-	if (result.resultCount === 1) {
-    	logger.message("IDP Lookup: Found exactly 1 IDP");
-        outcome = "one";
+
+    function displayMessage(message) {
+        var anchor = "anchor-".concat(generateNumericToken('xxx'));
+        var halign = "left";
+        var script = "Array.prototype.slice.call(\n".concat(
+            "document.getElementsByClassName('callback-component')).forEach(\n").concat(
+                "function (e) {\n").concat(
+                    "  var message = e.firstElementChild;\n").concat(
+                        "  if (message.firstChild && message.firstChild.nodeName == '#text' && message.firstChild.nodeValue.trim() == '").concat(anchor).concat("') {\n").concat(
+                            "    message.className = \"\";\n").concat(
+                                "    message.style = \"text-align: left; inline-size: 430px; overflow-wrap: break-word;\";\n").concat(
+                                    "    message.align = \"").concat(halign).concat("\";\n").concat(
+                                        "    message.innerHTML = '").concat(message).concat("';\n").concat(
+                                            "  }\n").concat(
+                                                "})")
+        var fr = JavaImporter(
+            org.forgerock.openam.auth.node.api.Action,
+            javax.security.auth.callback.TextOutputCallback,
+            com.sun.identity.authentication.callbacks.ScriptTextOutputCallback
+        )
+        if (message.length && callbacks.isEmpty()) {
+            action = fr.Action.send(
+                new fr.TextOutputCallback(
+                    fr.TextOutputCallback.INFORMATION,
+                    anchor
+                ),
+                new fr.ScriptTextOutputCallback(script)
+            ).build()
+        }
+        else {
+            action = fr.Action.goTo(outcome).build();
+        }
     }
-  	else if (result.resultCount > 1) {
-    	logger.message("IDP Lookup: Found {} IDPs", result.resultCount);
-        outcome = "multiple";
-    }
-  	else {
-    	logger.message("IDP Lookup: Found no IDPs");
-    }
-    logger.message("IDP Lookup: end [outcome={}]", outcome);
 
     /*
-     * Parse a URL into its components and make them easily accessible by name
-     *
-     * Use in a Scripte Decision Node Script as follows:
-     * var referer = parseUrl(requestHeaders.get("referer").get(0));
-     * var origin = referer.origin;
+     * Generate a token in the desired format. All 'x' characters will be replaced with a random number 0-9.
      * 
-     * e.g.: https://openam-volker-dev.forgeblocks.com/am/XUI/?realm=/bravo&authIndexType=service&authIndexValue=InitiateOwnerClaim#/
-     * {
-     *     hash: '#/',
-     *     host: 'openam-volker-dev.forgeblocks.com',
-     *     hostname: 'openam-volker-dev.forgeblocks.com',
-     *     href: 'https://openam-volker-dev.forgeblocks.com/am/XUI/?realm=/bravo&authIndexType=service&authIndexValue=InitiateOwnerClaim#/',
-     *     origin: 'https://openam-volker-dev.forgeblocks.com',
-     *     pathname: '/am/XUI/',
-     *     port: '',
-     *     protocol: 'https',
-     *     search: '?realm=/bravo&authIndexType=service&authIndexValue=InitiateOwnerClaim',
-     *     username: '',
-     *     password: '',
-     *     searchParam: {
-     *         realm: '/bravo',
-     *         authIndexType: 'service',
-     *         authIndexValue: 'InitiateOwnerClaim'
-     *     }
-     * }
+     * Example:
+     * 'xxxxx' produces '28535'
+     * 'xxx-xxx' produces '432-521'
      */
-    function parseUrl(href) {
-        var m = href.match(/^(([^:\/?#]+):?(?:\/\/((?:([^\/?#:]*):([^\/?#:]*)@)?([^\/?#:]*)(?::([^\/?#:]*))?)))?([^?#]*)(\?[^#]*)?(#.*)?$/),
-        r = {
-            hash: m[10] || "",                      // #/
-            host: m[3] || "",                       // openam-volker-dev.forgeblocks.com
-            hostname: m[6] || "",                   // openam-volker-dev.forgeblocks.com
-            href: m[0] || "",                       // https://openam-volker-dev.forgeblocks.com/am/XUI/?realm=/bravo&authIndexType=service&authIndexValue=InitiateOwnerClaim#/
-            origin: m[1] || "",                     // https://openam-volker-dev.forgeblocks.com
-            pathname: m[8] || (m[1] ? "/" : ""),    // /am/XUI/
-            port: m[7] || "",                       // 
-            protocol: m[2] || "",                   // https
-            search: m[9] || "",                     // ?realm=/bravo&authIndexType=service&authIndexValue=InitiateOwnerClaim
-            username: m[4] || "",                   // 
-            password: m[5] || "",                   // 
-            searchParam: {}                         // { realm: '/bravo',
-                                                    //   authIndexType: 'service',
-                                                    //   authIndexValue: 'InitiateOwnerClaim' }
-        };
-        if (r.protocol.length == 2) {
-            r.protocol = "file:///" + r.protocol.toUpperCase();
-            r.origin = r.protocol + "//" + r.host;
-        }
-        if (r.search.length > 2) {
-            var query = (r.search.indexOf('?') === 0) ? r.search.substr(1) : r.search;
-            var vars = query.split('&');
-            for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split('=');
-            r.searchParam[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-            }
-        }
-        r.href = r.origin + r.pathname + r.search + r.hash;
-        return r;
-    };
-}());
+    function generateNumericToken(format) {
+        return format.replace(/[x]/g, function (c) {
+            var r = Math.random() * 10 | 0;
+            var v = r;
+            return v.toString(10);
+        });
+    }
+
+}()); // self-invoking function
