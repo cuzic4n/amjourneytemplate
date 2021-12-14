@@ -66,85 +66,16 @@
           html += "<tr><td>" + stateKey + "</td><td>" + transientState.get(stateKey) + "</td></tr>";
         }
       });
-      
-      // looking for a way to build this IDM User Profile list dynamically
-      var objAttrs = [    
-        "_id",
-        "userName",
-        "password",
-        "accountStatus",
-        "effectiveRoles",
-        "effectiveAssignments",
-        "postalCode",
-        "stateProvince",
-        "postalAddress",
-        "description",
-        "country",
-        "city",
-        "givenName",
-        "sn",
-        "telephoneNumber",
-        "mail",
-        "frIndexedString1",
-        "frIndexedString2",
-        "frIndexedString3",
-        "frIndexedString4",
-        "frIndexedString5",
-        "frUnindexedString1",
-        "frUnindexedString2",
-        "frUnindexedString3",
-        "frUnindexedString4",
-        "frUnindexedString5",
-        "frIndexedMultivalued1",
-        "frIndexedMultivalued2",
-        "frIndexedMultivalued3",
-        "frIndexedMultivalued4",
-        "frIndexedMultivalued5",
-        "frUnindexedMultivalued1",
-        "frUnindexedMultivalued2",
-        "frUnindexedMultivalued3",
-        "frUnindexedMultivalued4",
-        "frUnindexedMultivalued5",
-        "frIndexedDate1",
-        "frIndexedDate2",
-        "frIndexedDate3",
-        "frIndexedDate4",
-        "frIndexedDate5",
-        "frUnindexedDate1",
-        "frUnindexedDate2",
-        "frUnindexedDate3",
-        "frUnindexedDate4",
-        "frUnindexedDate5",
-        "frIndexedInteger1",
-        "frIndexedInteger2",
-        "frIndexedInteger3",
-        "frIndexedInteger4",
-        "frIndexedInteger5",
-        "frUnindexedInteger1",
-        "frUnindexedInteger2",
-        "frUnindexedInteger3",
-        "frUnindexedInteger4",
-        "frUnindexedInteger5",
-        "consentedMappings",
-        "kbaInfo",
-        "preferences",
-        "aliasList",
-        "memberOfOrgIDs",
-        "manager"  
-      ];
-      var attrs;
+          
       // Build the rows of objectAttributes in sharedState
       if (sharedState.get("objectAttributes"))
       {
     
         html += "<tr><td colspan=\"2\"><br></td></tr>";
         html += "<tr><td colspan=\"2\"><u><b>Shared Object Attributes<b></u></td></tr>";
-        attrs = sharedState.get("objectAttributes");
-        objAttrs.forEach(function (attr) {
-          if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
-          {
-            html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
-          }
+        var entries = sharedState.get('objectAttributes').entrySet().toArray();
+        entries.forEach(function (entry) { // showing how to use entrySet(). Can use keySet().
+            html += "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
         });
       }
       else {
@@ -156,12 +87,9 @@
       {
         html += "<tr><td colspan=\"2\"><br></td></tr>";
         html += "<tr><td colspan=\"2\"><u><b>Transient Object Attributes<b></u></td></tr>";
-        attrs = transientState.get("objectAttributes");
-        objAttrs.forEach(function (attr) {
-          if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
-          {
-            html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
-          }
+        var keys = transientState.get('objectAttributes').keySet().toArray();
+        keys.forEach(function (key) { // showing how to use keySet(). Can use entrySet().
+            html += "<tr><td>" + key + "</td><td>" + transientState.get('objectAttributes').get(key) + "</td></tr>";
         });
       }
       else {
