@@ -31,7 +31,7 @@
   */
   function createHtml() {
       var html = "<table>";
-      html += "<tr><td colspan=\"2\"><b>Shared State Variables<b></td></tr>";
+      html += "<tr><td colspan=\"2\"><u><b>Shared State Variables<b><u></td></tr>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -42,14 +42,15 @@
         if (sharedState.get(stateKey) 
             && sharedState.get(stateKey).toString() !== "null"
             && sharedState.get(stateKey).toString() !== ""
-            && ""+stateKey !== "objectAttributes") 
+            && ""+stateKey !== "objectAttributes"
+            && ""+stateKey !== "pageNodeCallbacks") //pageNodeCallbacks are internal to the Page Node and not needed/used  
         {
           html += "<tr><td>" + stateKey + "</td><td>" + sharedState.get(stateKey) + "</td></tr>";
         }
       });
     
       html += "<tr><td colspan=\"2\"><br></td></tr>";
-      html += "<tr><td colspan=\"2\"><b>Transient State Variables<b></td></tr>";
+      html += "<tr><td colspan=\"2\"><u><b>Transient State Variables<b></u></td></tr>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -66,10 +67,11 @@
         }
       });
       
-      // Still looking for a way to build this IDM User Profile list dynamically
+      // looking for a way to build this IDM User Profile list dynamically
       var objAttrs = [    
         "_id",
         "userName",
+        "password",
         "accountStatus",
         "effectiveRoles",
         "effectiveAssignments",
@@ -131,12 +133,12 @@
         "manager"  
       ];
       var attrs;
-      // Build the rows of sharedState
+      // Build the rows of objectAttributes in sharedState
       if (sharedState.get("objectAttributes"))
       {
     
         html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><b>Shared Object Attributes<b></td></tr>";
+        html += "<tr><td colspan=\"2\"><u><b>Shared Object Attributes<b></u></td></tr>";
         attrs = sharedState.get("objectAttributes");
         objAttrs.forEach(function (attr) {
           if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
@@ -145,11 +147,15 @@
           }
         });
       }
-      // Build the rows of transientState
+      else {
+        html += "<tr><td colspan=\"2\">EMPTY</td></tr>";
+      }
+
+      // Build the rows of objectAttributes in transientState
       if (transientState.get("objectAttributes"))
       {
         html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><b>Transient Object Attributes<b></td></tr>";
+        html += "<tr><td colspan=\"2\"><u><b>Transient Object Attributes<b></u></td></tr>";
         attrs = transientState.get("objectAttributes");
         objAttrs.forEach(function (attr) {
           if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
@@ -158,8 +164,11 @@
           }
         });
       }
+      else {
+        html += "<tr><td colspan=\"2\">EMPTY</td></tr>";
+      }
       
-      // Still looking for a way to build this AM User Profile list dynamically
+      // looking for a way to build this AM User Profile list dynamically
       var objAMAttrs = [
         "uid",
         "cn",
@@ -216,23 +225,66 @@
         "fr-attr-int4",
         "fr-attr-int5"
       ];  
+      
       // Build the rows of idRepository binding
+      var attrs2;
       if (sharedState.get("_id") && idRepository.getAttribute(sharedState.get("_id"), "uid"))
       {
         html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><b>idRepository AM User Profile<b></td></tr>";        
-        var id = sharedState.get("_id")
+        html += "<tr><td colspan=\"2\"><u><b>idRepository AM User Profile<b></u></td></tr>";        
+        var id = sharedState.get("_id");
         objAMAttrs.forEach(function (attr) {
-          attrs = singleValue(idRepository.getAttribute(id, attr));
-          if (attrs && ""+attrs !== "null" && ""+attrs !== "") 
-          {
+          attrs = idRepository.getAttribute(id, attr);  
+          if (attrs && ""+attrs !== "null" && ""+attrs !== "" && ""+attrs.size()>0){
+            if (attrs.size()===1){
+            	attrs = singleValue(attrs);
+          	}
             html += "<tr><td>" + attr + "</td><td>" + attrs + "</td></tr>";
           }
-        });
-        html += "</table>";
-      }    
-      return html;
+        });      
+      }
+    
+      //show requestheaders
+      // looking for a way to build this header list dynamically
+      var headers = [
+        "accept",
+        "accept-api-version",
+        "protocol",
+        "resource",
+        "accept-encoding",
+        "accept-language",
+        "content-length",
+        "content-type",
+        "cookie",
+        "host",
+        "origin",
+        "referer",
+        "sec-ch-ua",
+        "sec-cha-ua-mobile",
+        "sec-ch-ua-platform",
+        "sec-fetch-dest",
+        "sec-fetch-mode",
+        "sec-fetch-site",
+        "user-agent",
+        "via",
+        "x-client-data",
+        "x-cloud-trace-context",
+        "x-forgerock-transactionid",
+        "x-forwarded-for",
+        "x-forwarded-proto",
+        "x-requested-with"
+      ];
+    
+      html += "<tr><td colspan=\"2\"><br></td></tr>";
+      html += "<tr><td colspan=\"2\"><u><b>Request Headers<b></u></td></tr>";
+      html += "<tr><td colspan=\"2\">" + requestHeaders.toString() + "</td></tr>";
+
+    
+    html += "</table>";
+      
+    return html;
   }
+  
   //builds the html to display the message in the browser on the callback
   //use view source in browser and look for class="callback-component" to see html response
   function displayMessage(message) {
@@ -244,7 +296,7 @@
                   "  var message = e.firstElementChild;\n").concat(
                       "  if (message.firstChild && message.firstChild.nodeName == '#text' && message.firstChild.nodeValue.trim() == '").concat(anchor).concat("') {\n").concat(
                           "    message.className = \"\";\n").concat(
-                              "    message.style = \"text-align: left; inline-size: 430px; overflow-wrap: break-word;\";\n").concat(
+                              "    message.style = \"text-align: left; inline-size: 630px; overflow-wrap: break-word;\";\n").concat(
                                   "    message.align = \"").concat(halign).concat("\";\n").concat(
                                       "    message.innerHTML = '").concat(message).concat("';\n").concat(
                                           "  }\n").concat(
