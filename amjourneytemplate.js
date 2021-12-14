@@ -153,7 +153,7 @@
         "fr-attr-int4",
         "fr-attr-int5"
       ];  
-      
+
       // Build the rows of idRepository binding
       var attrs2;
       if (sharedState.get("_id") && idRepository.getAttribute(sharedState.get("_id"), "uid"))
