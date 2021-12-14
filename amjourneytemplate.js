@@ -5,25 +5,30 @@
  * Description of the script goes here
  * 
  * This script needs to be parametrized. It will not work properly as is. 
- * It requires ???? nodes before
- * it can operate.
+ * It requires some nodes that set at least sharedState before it can operate.
+ * For example, set a page node with Platform Username and Platform Password nodes
  * 
  * The Scripted Decision Node needs the following outcomes defined:
  * - true
- *   describe true outcome
- * - false 
- *   describe false outcome
  */
-// Do everything in a self-invoking function and do not write code outside of a function or you will pay dearly. This is because of top-level scoping/whitelisting/etc issues that give you 'undefined' errors.
+
+// Do everything in a self-invoking function and do not write code outside of a function or you will pay dearly. 
+// This is because of top-level scoping/whitelisting/etc issues that give you 'undefined' errors.
 (function () {
-  logger.message("Script: start");
+  logger.message("Script: start"); // beging of script main
   outcome = "true"; // <- fill in default outcome here and it should match a "Script Outcomes" setting on this node itself
 
+  // build output html table that will be sent back to browser
   var output = createHtml();
+
+  // issue callback to browser after output html is built from createHtml() function
   displayMessage(output);
+  
+  logger.message("Script: end"); // end of script main
 
-  logger.message("Script: end");
-
+  /*
+  * Put functions below here
+  */
   function createHtml() {
       var html = "<table>";
       html += "<tr><td colspan=\"2\"><b>Shared State Variables<b></td></tr>";
@@ -61,7 +66,7 @@
         }
       });
       
-      // Still looking for a way to build this AM userprofile list dynamically
+      // Still looking for a way to build this IDM User Profile list dynamically
       var objAttrs = [    
         "_id",
         "userName",
@@ -134,9 +139,7 @@
         html += "<tr><td colspan=\"2\"><b>Shared Object Attributes<b></td></tr>";
         attrs = sharedState.get("objectAttributes");
         objAttrs.forEach(function (attr) {
-          if (attrs.get(attr) 
-              && ""+attrs.get(attr) !== "null"
-              && ""+attrs.get(attr) !== "") 
+          if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
           {
             html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
           }
@@ -149,16 +152,85 @@
         html += "<tr><td colspan=\"2\"><b>Transient Object Attributes<b></td></tr>";
         attrs = transientState.get("objectAttributes");
         objAttrs.forEach(function (attr) {
-          if (attrs.get(attr) 
-              && ""+attrs.get(attr) !== "null"
-              && ""+attrs.get(attr) !== "") 
+          if (attrs.get(attr) && ""+attrs.get(attr) !== "null" && ""+attrs.get(attr) !== "") 
           {
             html += "<tr><td>" + attr + "</td><td>" + attrs.get(attr) + "</td></tr>";
           }
         });
-        html += "</table>";
       }
-    
+      
+      // Still looking for a way to build this AM User Profile list dynamically
+      var objAMAttrs = [
+        "uid",
+        "cn",
+        "inetUserStatus",
+        "givenName",
+        "sn",
+        "mail",
+        "description",
+        "telephoneNumber",
+        "street",
+        "l",
+        "postalCode",
+        "co",
+        "st",
+        "displayName",
+        "fr-attr-istr1",
+        "fr-attr-istr2",
+        "fr-attr-istr3",
+        "fr-attr-istr4",
+        "fr-attr-istr5",
+        "fr-attr-str1",
+        "fr-attr-str2",
+        "fr-attr-str3",
+        "fr-attr-str4",
+        "fr-attr-str5",
+        "fr-attr-imulti1",
+        "fr-attr-imulti2",
+        "fr-attr-imulti3",
+        "fr-attr-imulti4",
+        "fr-attr-imulti5",
+        "fr-attr-multi1",
+        "fr-attr-multi2",
+        "fr-attr-multi3",
+        "fr-attr-multi4",
+        "fr-attr-multi5",
+        "fr-attr-idate1",
+        "fr-attr-idate2",
+        "fr-attr-idate3",
+        "fr-attr-idate4",
+        "fr-attr-idate5",
+        "fr-attr-date1",
+        "fr-attr-date2",
+        "fr-attr-date3",
+        "fr-attr-date4",
+        "fr-attr-date5",
+        "fr-attr-iint1",
+        "fr-attr-iint2",
+        "fr-attr-iint3",
+        "fr-attr-iint4",
+        "fr-attr-iint5",
+        "fr-attr-int1",
+        "fr-attr-int2",
+        "fr-attr-int3",
+        "fr-attr-int4",
+        "fr-attr-int5"
+      ];  
+      // Build the rows of idRepository binding
+      if (sharedState.get("_id") && idRepository.getAttribute(sharedState.get("_id"), "uid"))
+      {
+        html += "<tr><td colspan=\"2\"><br></td></tr>";
+        html += "<tr><td colspan=\"2\"><b>idRepository AM User Profile<b></td></tr>";        
+        var id = sharedState.get("_id")
+        objAMAttrs.forEach(function (attr) {
+          attrs = singleValue(idRepository.getAttribute(id, attr));
+          if (attrs && ""+attrs !== "null" && ""+attrs !== "") 
+          {
+            html += "<tr><td>" + attr + "</td><td>" + attrs + "</td></tr>";
+          }
+        });
+        html += "</table>";
+      }    
       return html;
   }
   //builds the html to display the message in the browser on the callback
@@ -209,6 +281,18 @@
           var v = r;
           return v.toString(10);
       });
+  }
+
+  // get a singleValue from a HashSet
+  function singleValue(x)
+  {
+    if(x.size()>0)
+      {
+        return x.iterator().next();
+      }
+      
+    return "";
+    
   }
 
 }()); // self-invoking function
