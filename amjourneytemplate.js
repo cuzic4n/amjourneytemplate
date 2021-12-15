@@ -172,41 +172,17 @@
         });      
       }
     
-      //show requestheaders
-      // looking for a way to build this header list dynamically
-      var headers = [
-        "accept",
-        "accept-api-version",
-        "protocol",
-        "resource",
-        "accept-encoding",
-        "accept-language",
-        "content-length",
-        "content-type",
-        "cookie",
-        "host",
-        "origin",
-        "referer",
-        "sec-ch-ua",
-        "sec-cha-ua-mobile",
-        "sec-ch-ua-platform",
-        "sec-fetch-dest",
-        "sec-fetch-mode",
-        "sec-fetch-site",
-        "user-agent",
-        "via",
-        "x-client-data",
-        "x-cloud-trace-context",
-        "x-forgerock-transactionid",
-        "x-forwarded-for",
-        "x-forwarded-proto",
-        "x-requested-with"
-      ];
     
       html += "<tr><td colspan=\"2\"><br></td></tr>";
       html += "<tr><td colspan=\"2\"><u><b>Request Headers<b></u></td></tr>";
-      html += "<tr><td colspan=\"2\">" + requestHeaders.toString() + "</td></tr>";
-
+      //html += "<tr><td colspan=\"2\">" + requestHeaders.toString() + "</td></tr>";
+	  var rHeaders = String(requestHeaders).split('], ').map(function (header){
+        return header.split('=')[0].replace('{','').replace('}',''); 
+      });                                                    
+      rHeaders.forEach(function (headerName) {
+        var header = requestHeaders.get(headerName);
+        html += "<tr><td>" + headerName + "</td><td>" + header.get(0) + "</td></tr>";
+      });    
     
     html += "</table>";
       
