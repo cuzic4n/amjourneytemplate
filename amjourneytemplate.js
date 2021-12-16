@@ -30,8 +30,8 @@
   * Put functions below here
   */
   function createHtml() {
-      var html = "<table>";
-      html += "<tr><td colspan=\"2\"><u><b>Shared State Variables<b><u></td></tr>";
+      var html = "<table class=\"table table-striped\">";
+      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Shared State Variables</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -48,9 +48,11 @@
           html += "<tr><td>" + stateKey + "</td><td>" + sharedState.get(stateKey) + "</td></tr>";
         }
       });
-    
-      html += "<tr><td colspan=\"2\"><br></td></tr>";
-      html += "<tr><td colspan=\"2\"><u><b>Transient State Variables<b></u></td></tr>";
+      html += "</table>";
+
+      html += "<br><table class=\"table table-striped\">";
+      
+      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Transient State Variables</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -66,13 +68,13 @@
           html += "<tr><td>" + stateKey + "</td><td>" + transientState.get(stateKey) + "</td></tr>";
         }
       });
-          
-      // Build the rows of objectAttributes in sharedState
+      html += "</table>";
+
+      html += "<br><table class=\"table table-striped\">";
+      // Build the table of objectAttributes in sharedState
       if (sharedState.get("objectAttributes"))
-      {
-    
-        html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><u><b>Shared Object Attributes<b></u></td></tr>";
+      {   
+        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Shared Object Attributes</th></tr></thead>";
         var entries = sharedState.get('objectAttributes').entrySet().toArray();
         entries.forEach(function (entry) { // showing how to use entrySet(). Can use keySet().
             html += "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
@@ -81,12 +83,13 @@
       else {
         html += "<tr><td colspan=\"2\">EMPTY</td></tr>";
       }
+      html += "</table>";
 
-      // Build the rows of objectAttributes in transientState
+      html += "<br><table class=\"table table-striped\">";
+      // Build the table of objectAttributes in transientState
       if (transientState.get("objectAttributes"))
       {
-        html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><u><b>Transient Object Attributes<b></u></td></tr>";
+        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Transient Object Attributes</th></tr></thead>";
         var keys = transientState.get('objectAttributes').keySet().toArray();
         keys.forEach(function (key) { // showing how to use keySet(). Can use entrySet().
             html += "<tr><td>" + key + "</td><td>" + transientState.get('objectAttributes').get(key) + "</td></tr>";
@@ -95,7 +98,9 @@
       else {
         html += "<tr><td colspan=\"2\">EMPTY</td></tr>";
       }
-      
+      html += "</table>";
+
+      html += "<br><table class=\"table table-striped\">";
       // looking for a way to build this AM User Profile list dynamically
       var objAMAttrs = [
         "uid",
@@ -154,12 +159,11 @@
         "fr-attr-int5"
       ];  
 
-      // Build the rows of idRepository binding
+      // Build the table of idRepository binding
       var attrs2;
       if (sharedState.get("_id") && idRepository.getAttribute(sharedState.get("_id"), "uid"))
       {
-        html += "<tr><td colspan=\"2\"><br></td></tr>";
-        html += "<tr><td colspan=\"2\"><u><b>idRepository AM User Profile<b></u></td></tr>";        
+        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">idRepository AM User Profile</th></tr></thead>";        
         var id = sharedState.get("_id");
         objAMAttrs.forEach(function (attr) {
           attrs = idRepository.getAttribute(id, attr);  
@@ -171,10 +175,10 @@
           }
         });      
       }
-    
-    
-      html += "<tr><td colspan=\"2\"><br></td></tr>";
-      html += "<tr><td colspan=\"2\"><u><b>Request Headers<b></u></td></tr>";
+      html += "</table>";
+      
+      html += "<br><table class=\"table table-striped\">";
+      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Request Headers</th></tr></thead>";
       //html += "<tr><td colspan=\"2\">" + requestHeaders.toString() + "</td></tr>";
 	  var rHeaders = String(requestHeaders).split('], ').map(function (header){
         return header.split('=')[0].replace('{','').replace('}',''); 
