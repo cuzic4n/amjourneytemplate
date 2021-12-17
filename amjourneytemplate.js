@@ -31,7 +31,7 @@
   */
   function createHtml() {
       var html = "<table class=\"table table-striped\">";
-      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Shared State Variables</th></tr></thead>";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared State Variables</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -45,14 +45,14 @@
             && ""+stateKey !== "objectAttributes"
             && ""+stateKey !== "pageNodeCallbacks") //pageNodeCallbacks are internal to the Page Node and not needed/used  
         {
-          html += "<tr><td>" + stateKey + "</td><td>" + sharedState.get(stateKey) + "</td></tr>";
+          html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + sharedState.get(stateKey) + "</td></tr>";
         }
       });
       html += "</table>";
 
-      html += "<br><table class=\"table table-striped\">";
+      html += "<table class=\"table table-striped\">";
       
-      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Transient State Variables</th></tr></thead>";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient State Variables</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -65,19 +65,19 @@
             && transientState.get(stateKey).toString() !== ""
             && ""+stateKey !== "objectAttributes") 
         {
-          html += "<tr><td>" + stateKey + "</td><td>" + transientState.get(stateKey) + "</td></tr>";
+          html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + transientState.get(stateKey) + "</td></tr>";
         }
       });
       html += "</table>";
 
-      html += "<br><table class=\"table table-striped\">";
+      html += "<table class=\"table table-striped\">";
       // Build the table of objectAttributes in sharedState
       if (sharedState.get("objectAttributes"))
       {   
-        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Shared Object Attributes</th></tr></thead>";
+        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared Object Attributes</th></tr></thead>";
         var entries = sharedState.get('objectAttributes').entrySet().toArray();
         entries.forEach(function (entry) { // showing how to use entrySet(). Can use keySet().
-            html += "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
+            html += "<tr><td class=\"px-1 py-1\">" + entry.getKey() + "</td><td class=\"px-1 py-1\">" + entry.getValue() + "</td></tr>";
         });
       }
       else {
@@ -85,14 +85,14 @@
       }
       html += "</table>";
 
-      html += "<br><table class=\"table table-striped\">";
+      html += "<table class=\"table table-striped\">";
       // Build the table of objectAttributes in transientState
       if (transientState.get("objectAttributes"))
       {
-        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Transient Object Attributes</th></tr></thead>";
+        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient Object Attributes</th></tr></thead>";
         var keys = transientState.get('objectAttributes').keySet().toArray();
         keys.forEach(function (key) { // showing how to use keySet(). Can use entrySet().
-            html += "<tr><td>" + key + "</td><td>" + transientState.get('objectAttributes').get(key) + "</td></tr>";
+            html += "<tr><td class=\"px-1 py-1\">" + key + "</td><td class=\"px-1 py-1\">" + transientState.get('objectAttributes').get(key) + "</td></tr>";
         });
       }
       else {
@@ -100,7 +100,7 @@
       }
       html += "</table>";
 
-      html += "<br><table class=\"table table-striped\">";
+      html += "<table class=\"table table-striped\">";
       // looking for a way to build this AM User Profile list dynamically
       var objAMAttrs = [
         "uid",
@@ -163,7 +163,7 @@
       var attrs2;
       if (sharedState.get("_id") && idRepository.getAttribute(sharedState.get("_id"), "uid"))
       {
-        html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">idRepository AM User Profile</th></tr></thead>";        
+        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">idRepository AM User Profile</th></tr></thead>";        
         var id = sharedState.get("_id");
         objAMAttrs.forEach(function (attr) {
           attrs = idRepository.getAttribute(id, attr);  
@@ -171,21 +171,21 @@
             if (attrs.size()===1){
             	attrs = singleValue(attrs);
           	}
-            html += "<tr><td>" + attr + "</td><td>" + attrs + "</td></tr>";
+            html += "<tr><td class=\"px-1 py-1\">" + attr + "</td><td class=\"px-1 py-1\">" + attrs + "</td></tr>";
           }
         });      
       }
       html += "</table>";
       
-      html += "<br><table class=\"table table-striped\">";
-      html += "<thead class=\"thead-dark\"><tr><th colspan=\"2\">Request Headers</th></tr></thead>";
+      html += "<table class=\"table table-striped\">";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Request Headers</th></tr></thead>";
       //html += "<tr><td colspan=\"2\">" + requestHeaders.toString() + "</td></tr>";
 	  var rHeaders = String(requestHeaders).split('], ').map(function (header){
         return header.split('=')[0].replace('{','').replace('}',''); 
       });                                                    
       rHeaders.forEach(function (headerName) {
         var header = requestHeaders.get(headerName);
-        html += "<tr><td>" + headerName + "</td><td>" + header.get(0) + "</td></tr>";
+        html += "<tr><td class=\"px-1 py-1\">" + headerName + "</td><td class=\"px-1 py-1\">" + header.get(0) + "</td></tr>";
       });    
     
     html += "</table>";
@@ -204,7 +204,7 @@
                   "  var message = e.firstElementChild;\n").concat(
                       "  if (message.firstChild && message.firstChild.nodeName == '#text' && message.firstChild.nodeValue.trim() == '").concat(anchor).concat("') {\n").concat(
                           "    message.className = \"\";\n").concat(
-                              "    message.style = \"text-align: left; inline-size: 630px; overflow-wrap: break-word;\";\n").concat(
+                              "    message.style = \"\";\n").concat(
                                   "    message.align = \"").concat(halign).concat("\";\n").concat(
                                       "    message.innerHTML = '").concat(message).concat("';\n").concat(
                                           "  }\n").concat(
