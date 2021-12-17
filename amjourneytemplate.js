@@ -31,7 +31,7 @@
   */
   function createHtml() {
       var html = "<table class=\"table table-striped\">";
-      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared State Variables</th></tr></thead>";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared State Variables (sharedState.get)</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -42,7 +42,7 @@
         if (sharedState.get(stateKey) 
             && sharedState.get(stateKey).toString() !== "null"
             && sharedState.get(stateKey).toString() !== ""
-            && ""+stateKey !== "objectAttributes"
+            && ""+stateKey !== "objectAttributes"  // going to pull out objectAttributes later
             && ""+stateKey !== "pageNodeCallbacks") //pageNodeCallbacks are internal to the Page Node and not needed/used  
         {
           html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + sharedState.get(stateKey) + "</td></tr>";
@@ -52,7 +52,7 @@
 
       html += "<table class=\"table table-striped\">";
       
-      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient State Variables</th></tr></thead>";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient State Variables (transientState.get)</th></tr></thead>";
       // get all the keys in nodeState
       var iterator = nodeState.keys().iterator();
       var stateKeys = [];
@@ -74,7 +74,7 @@
       // Build the table of objectAttributes in sharedState
       if (sharedState.get("objectAttributes"))
       {   
-        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared Object Attributes</th></tr></thead>";
+        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Shared Object Attributes (sharedState.get)</th></tr></thead>";
         var entries = sharedState.get('objectAttributes').entrySet().toArray();
         entries.forEach(function (entry) { // showing how to use entrySet(). Can use keySet().
             html += "<tr><td class=\"px-1 py-1\">" + entry.getKey() + "</td><td class=\"px-1 py-1\">" + entry.getValue() + "</td></tr>";
@@ -89,7 +89,7 @@
       // Build the table of objectAttributes in transientState
       if (transientState.get("objectAttributes"))
       {
-        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient Object Attributes</th></tr></thead>";
+        html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient Object Attributes (transientState.get)</th></tr></thead>";
         var keys = transientState.get('objectAttributes').keySet().toArray();
         keys.forEach(function (key) { // showing how to use keySet(). Can use entrySet().
             html += "<tr><td class=\"px-1 py-1\">" + key + "</td><td class=\"px-1 py-1\">" + transientState.get('objectAttributes').get(key) + "</td></tr>";
@@ -99,6 +99,27 @@
         html += "<tr><td colspan=\"2\">EMPTY</td></tr>";
       }
       html += "</table>";
+
+      html += "<table class=\"table table-striped\">";
+      html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">nodeState.get (transientState, secureState, sharedState)</th></tr></thead>";
+      // get all the keys in nodeState
+      var iterator = nodeState.keys().iterator();
+      var stateKeys = [];
+      while (iterator.hasNext()) {
+          stateKeys.push(iterator.next().toString());
+      }
+      stateKeys.forEach(function (stateKey) {
+        if (nodeState.get(stateKey) 
+            && nodeState.get(stateKey).toString() !== "null"
+            && nodeState.get(stateKey).toString() !== ""
+            && ""+stateKey !== "pageNodeCallbacks") //pageNodeCallbacks are internal to the Page Node and not needed/used  
+
+        {
+          html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + nodeState.get(stateKey) + "</td></tr>";
+        }
+      });
+      html += "</table>";
+
 
       html += "<table class=\"table table-striped\">";
       // looking for a way to build this AM User Profile list dynamically
