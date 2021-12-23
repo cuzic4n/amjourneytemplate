@@ -1,4 +1,8 @@
-/* AM Journey Template
+/* DISCLAIMER: This code is provided to you expressly as an example  (“Sample Code”). It is the responsibility of the individual recipient user, in his/her sole discretion, to diligence such Sample Code for accuracy, completeness, security, and final determination for appropriateness of use. 
+ * ANY SAMPLE CODE IS PROVIDED ON AN “AS IS” IS BASIS, WITHOUT WARRANTY OF ANY KIND. FORGEROCK AND ITS LICENSORS EXPRESSLY DISCLAIM ALL WARRANTIES,  WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION, THE IMPLIED WARRANTIES  OF MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * FORGEROCK SHALL NOT HAVE ANY LIABILITY ARISING OUT OF OR RELATING TO ANY USE, IMPLEMENTATION, INTEGRATION, OR CONFIGURATION OF ANY SAMPLE CODE IN ANY PRODUCTION ENVIRONMENT OR FOR ANY COMMERCIAL DEPLOYMENT(S).
+ *
+ * Script Name: AM Journey Template
  *
  * Authors: se@forgerock.com
  * 
@@ -12,7 +16,7 @@
  * 
  * This Scripted Decision Node needs the following outcomes defined:
  * - true
- */
+*/
 
 // Do everything in a self-invoking function and do not write code outside of a function or you will pay dearly. 
 // This is because of top-level scoping/whitelisting/etc issues that give you 'undefined' errors.
