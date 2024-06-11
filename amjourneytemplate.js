@@ -23,7 +23,8 @@
 (function () {
   logger.message("Script: start"); // beging of script main
   outcome = "true"; // <- fill in default outcome here and it should match a "Script Outcomes" setting on this node itself
-
+  hidePasswords = true; //change to false to show passwords in transientState
+  
   // build output html table that will be sent back to browser
   var output = createHtml();
 
@@ -71,7 +72,12 @@
             && transientState.get(stateKey).toString() !== ""
             && ""+stateKey !== "objectAttributes") 
         {
-          html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + transientState.get(stateKey) + "</td></tr>";
+          if (hidePasswords && stateKey == "password" ) {
+              html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">***********</td></tr>";
+          }    
+          else{
+            html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + transientState.get(stateKey) + "</td></tr>";
+          }  
         }
       });
       html += "</table>";
@@ -98,7 +104,12 @@
         html += "<thead class=\"thead-dark\"><tr><th class=\"px-1 py-1\" colspan=\"2\">Transient Object Attributes (transientState.get)</th></tr></thead>";
         var keys = transientState.get('objectAttributes').keySet().toArray();
         keys.forEach(function (key) { // showing how to use keySet(). Can use entrySet().
-            html += "<tr><td class=\"px-1 py-1\">" + key + "</td><td class=\"px-1 py-1\">" + transientState.get('objectAttributes').get(key) + "</td></tr>";
+            if (hidePasswords && key == "password" ) {
+                html += "<tr><td class=\"px-1 py-1\">" + key + "</td><td class=\"px-1 py-1\">***********</td></tr>";
+            }
+            else {
+                html += "<tr><td class=\"px-1 py-1\">" + key + "</td><td class=\"px-1 py-1\">" + transientState.get('objectAttributes').get(key) + "</td></tr>";
+            }
         });
       }
       else {
@@ -121,7 +132,19 @@
             && ""+stateKey !== "pageNodeCallbacks") //pageNodeCallbacks are internal to the Page Node and not needed/used  
 
         {
-          html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + nodeState.get(stateKey) + "</td></tr>";
+          if (hidePasswords && stateKey == "password" ) {
+              html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">***********</td></tr>";
+          }
+          else {
+              if (""+stateKey === "objectAttributes") {
+                  var obj = nodeState.get(stateKey);   
+                  var redacted = JSON.parse(obj, (k, v) => k === "password" ? "********" : v);
+                  html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + JSON.stringify(redacted) + "</td></tr>";
+              }
+              else {
+                  html += "<tr><td class=\"px-1 py-1\">" + stateKey + "</td><td class=\"px-1 py-1\">" + nodeState.get(stateKey) + "</td></tr>";
+              }
+          }
         }
       });
       html += "</table>";
